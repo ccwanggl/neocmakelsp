@@ -11,6 +11,7 @@ pub fn get_signature_help(
     root: Node<'_>,
     source: &str,
 ) -> Option<SignatureHelp> {
+    let signature_res = BUILTIN_COMMAND_SIGNATURE_RES.as_ref()?;
     let query_cmd = Query::new(&TREESITTER_CMAKE_LANGUAGE, NORMAL_COMMAND_QUERY).unwrap();
     let mut query_cursor = QueryCursor::new();
     query_cursor.set_point_range(location.to_point()..location.to_point());
@@ -23,9 +24,7 @@ pub fn get_signature_help(
         if identifier.kind() != CMakeNodeKinds::IDENTIFIER {
             continue;
         }
-        if let Some(command) =
-            BUILTIN_COMMAND_SIGNATURE_RES.get(identifier.utf8_text(source.as_bytes()).unwrap())
-        {
+        if let Some(command) = signature_res.get(identifier.utf8_text(source.as_bytes()).unwrap()) {
             return Some(SignatureHelp {
                 signatures: vec![SignatureInformation {
                     label: command.signature.to_string(),

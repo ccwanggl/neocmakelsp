@@ -149,7 +149,9 @@ fn gen_builtin_commands() -> Vec<CompletionItem> {
         return cache_completes.data;
     }
 
-    let res = &*BUILTIN_COMMAND_SIGNATURE_RES;
+    let Some(res) = &*BUILTIN_COMMAND_SIGNATURE_RES else {
+        return vec![];
+    };
 
     let commands: Vec<CompletionItem> = res
         .iter()
@@ -352,16 +354,18 @@ static CMAKE_COMMANDS_HELP: LazyLock<Result<String>> = LazyLock::new(|| {
         .stdout;
     Ok(String::from_utf8_lossy(&output).to_string())
 });
+
 /// Resource for generating builtin signatures and commands
 /// the key is command name, not signature
-pub static BUILTIN_COMMAND_SIGNATURE_RES: LazyLock<HashMap<&str, CommandSignatureResource>> =
-    LazyLock::new(|| {
-        CMAKE_COMMANDS_HELP
-            .as_ref()
-            .map(String::as_str)
-            .map(gen_builtin_command_signature_resource)
-            .unwrap_or_default()
-    });
+pub static BUILTIN_COMMAND_SIGNATURE_RES: LazyLock<
+    Option<HashMap<&str, CommandSignatureResource>>,
+> = LazyLock::new(|| {
+    CMAKE_COMMANDS_HELP
+        .as_ref()
+        .map(String::as_str)
+        .map(gen_builtin_command_signature_resource)
+        .ok()
+});
 
 /// CMake builtin commands
 pub static BUILTIN_COMMAND: LazyLock<Vec<CompletionItem>> = LazyLock::new(gen_builtin_commands);
