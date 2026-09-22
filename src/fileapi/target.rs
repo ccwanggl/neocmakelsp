@@ -100,6 +100,7 @@ mod compile_group {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CompileGroup {
+    #[serde(default)]
     compile_command_fragments: Vec<compile_group::CommandFragment>,
     language: String,
     #[serde(flatten)]
@@ -108,7 +109,8 @@ pub struct CompileGroup {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Source {
-    backtrace: i32,
+    backtrace: Option<i32>,
+    #[serde(default)]
     backtraces: Vec<i32>,
     path: String,
 }
@@ -116,9 +118,11 @@ pub struct Source {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TargetInfo {
+    #[serde(default)]
     artifacts: Vec<Artifact>,
     codemodel_version: ApiVersion,
-    compile_groups: Option<Vec<CompileGroup>>,
+    #[serde(default)]
+    compile_groups: Vec<CompileGroup>,
     #[serde(rename = "type")]
     type_: String,
     sources: Vec<Source>,
